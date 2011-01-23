@@ -53,7 +53,7 @@ done
 for i in man/*8 ; do
     %{__install} -D -m 0755 $i %{buildroot}%{_mandir}/man8/${i##man/}
 done
-%{__install} -d -m 0755 %{buildroot}{/etc/service}
+%{__install} -d -m 0755 %{buildroot}/etc/service
 %{__install} -D -m 0750 etc/2 %{buildroot}%{_sbindir}/runsvdir-start
 
 %clean
@@ -98,7 +98,6 @@ fi
 %doc doc/* etc/
 %doc package/CHANGES package/COPYING package/README package/THANKS package/TODO
 %dir /etc/service
-%{_sbindir}/rc%{name}
 
 %changelog
 * Sun Jan 23 2011 ianmmeyer@gmail.com
