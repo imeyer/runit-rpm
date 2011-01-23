@@ -1,0 +1,13 @@
+Index: src/sv.c
+===================================================================
+--- src/sv.c.orig       2008-06-15 22:53:26.000000000 +0200
++++ src/sv.c    2008-11-26 13:58:17.469015843 +0100
+@@ -32,7 +32,7 @@
+ char *progname;
+ char *action;
+ char *acts;
+-char *varservice ="/service/";
++char *varservice ="/etc/service/";
+ char **service;
+ char **servicex;
+ unsigned int services;
