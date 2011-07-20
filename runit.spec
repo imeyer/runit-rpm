@@ -5,7 +5,7 @@
 
 Name:           runit
 Version:        2.1.1
-Release:        3
+Release:        4
 
 Group:          System/Base
 License:        BSD
@@ -120,8 +120,9 @@ fi
 %dir /etc/service
 
 %changelog
-* Wed Jul 20 2011 Robin Bowes <robin.bowes@yo61.com> 2.1.1-3
+* Wed Jul 20 2011 Robin Bowes <robin.bowes@yo61.com> 2.1.1-4
 -  2.1.1-3 Add BuildRequires
+-  2.1.1-4 Support systems using upstart
 
 * Sun Jan 23 2011 ianmmeyer@gmail.com
 - Make compatible with Redhat based systems
