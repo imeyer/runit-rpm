@@ -45,8 +45,8 @@ Authors:
     Gerrit Pape <pape@smarden.org>
 
 %prep
-%setup -n admin/%{name}-%{version}
-pushd %{name}-%{version}/src
+%setup -q -n admin/%{name}-%{version}
+pushd src
 echo "%{?_with_dietlibc:diet -Os }%__cc $RPM_OPT_FLAGS" >conf-cc
 echo "%{?_with_dietlibc:diet -Os }%__cc -Os -pipe"      >conf-ld
 popd
