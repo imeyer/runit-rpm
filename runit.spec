@@ -64,14 +64,32 @@ done
 %post
 if [ $1 = 1 ];
 then
-  grep -q 'RI:123456:respawn:/sbin/runsvdir-start' /etc/inittab
-  if [ $? -eq 1 ]
+  init_style=$(rpm --queryformat='%{name}' -qf /sbin/init)
+  if [ "$init_style" == "upstart" ]
   then
-    echo -n "Installing /sbin/runsvdir-start into /etc/inittab.."
-    echo "RI:123456:respawn:/sbin/runsvdir-start" >> /etc/inittab
-    echo " success."
-    # Reload init
-    telinit q
+    cat >/etc/init/runsvdir.conf <<\EOT
+# for runit - manage /usr/sbin/runsvdir-start
+start on runlevel 2
+start on runlevel 3
+start on runlevel 4
+start on runlevel 5
+stop on shutdown
+respawn
+exec /usr/sbin/runsvdir-start
+EOT
+    # tell init to start the new service
+    start runsvdir
+    
+  else
+    grep -q 'RI:123456:respawn:/sbin/runsvdir-start' /etc/inittab
+    if [ $? -eq 1 ]
+    then
+      echo -n "Installing /sbin/runsvdir-start into /etc/inittab.."
+      echo "RI:123456:respawn:/sbin/runsvdir-start" >> /etc/inittab
+      echo " success."
+      # Reload init
+      telinit q
+    fi
   fi
 fi
 
