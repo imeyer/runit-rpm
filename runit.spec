@@ -5,7 +5,7 @@
 
 Name:           runit
 Version:        2.1.1
-Release:        2
+Release:        3
 
 Group:          System/Base
 License:        BSD
@@ -22,6 +22,8 @@ Patch1:         runit-2.1.1-runsvdir-path-cleanup.patch
 
 Obsoletes: runit <= %{version}-%{release}
 Provides: runit = %{version}-%{release}
+
+BuildRequires: make gcc glibc-static
 
 Summary:        A UNIX init scheme with service supervision
 
@@ -100,5 +102,8 @@ fi
 %dir /etc/service
 
 %changelog
+* Wed Jul 20 2011 Robin Bowes <robin.bowes@yo61.com> 2.1.1-3
+-  2.1.1-3 Add BuildRequires
+
 * Sun Jan 23 2011 ianmmeyer@gmail.com
 - Make compatible with Redhat based systems
