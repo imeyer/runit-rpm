@@ -93,13 +93,29 @@ EOT
   fi
 fi
 
+%preun
+if [ $1 = 0 ];
+then
+  init_style=$(rpm --queryformat='%{name}' -qf /sbin/init)
+  if [ "$init_style" == "upstart" ]
+  then
+    stop runsvdir
+  fi
+fi
+
 %postun
 if [ $1 = 0 ];
 then
-  echo " #################################################"
-  echo " # Remove /sbin/runsvdir-start from /etc/inittab #"
-  echo " # if you really want to remove runit            #"
-  echo " #################################################"
+  init_style=$(rpm --queryformat='%{name}' -qf /sbin/init)
+  if [ "$init_style" == "upstart" ]
+  then
+    rm -f /etc/init/runsvdir.conf
+  else
+    echo " #################################################"
+    echo " # Remove /sbin/runsvdir-start from /etc/inittab #"
+    echo " # if you really want to remove runit            #"
+    echo " #################################################"
+  fi
 fi
 
 %files
