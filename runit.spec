@@ -8,7 +8,7 @@
 
 Name:           runit
 Version:        2.1.1
-Release:        4
+Release:        4%{?_with_dietlibc:diet}
 
 Group:          System/Base
 License:        BSD
