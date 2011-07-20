@@ -70,10 +70,9 @@ done
 %{__rm} -rf %{buildroot}
 
 %post
-if [ $1 = 1 ];
-then
-  init_style=$(rpm --queryformat='%{name}' -qf /sbin/init)
-  if [ "$init_style" == "upstart" ]
+if [ $1 = 1 ] ; then
+  rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
+  if [ $? -eq 0 ]
   then
     cat >/etc/init/runsvdir.conf <<\EOT
 # for runit - manage /usr/sbin/runsvdir-start
@@ -83,11 +82,10 @@ start on runlevel 4
 start on runlevel 5
 stop on shutdown
 respawn
-exec /usr/sbin/runsvdir-start
+exec /sbin/runsvdir-start
 EOT
     # tell init to start the new service
     start runsvdir
-    
   else
     grep -q 'RI:123456:respawn:/sbin/runsvdir-start' /etc/inittab
     if [ $? -eq 1 ]
@@ -102,20 +100,20 @@ EOT
 fi
 
 %preun
-if [ $1 = 0 ];
+if [ $1 = 0 ]
 then
-  init_style=$(rpm --queryformat='%{name}' -qf /sbin/init)
-  if [ "$init_style" == "upstart" ]
+  rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
+  if [ $? -eq 0 ]
   then
     stop runsvdir
   fi
 fi
 
 %postun
-if [ $1 = 0 ];
+if [ $1 = 0 ]
 then
-  init_style=$(rpm --queryformat='%{name}' -qf /sbin/init)
-  if [ "$init_style" == "upstart" ]
+  rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
+  if [ $? -eq 0 ]
   then
     rm -f /etc/init/runsvdir.conf
   else
