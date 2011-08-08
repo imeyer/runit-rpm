@@ -3,9 +3,12 @@
 #
 # Copyright (c) 2010 Ian Meyer <ianmmeyer@gmail.com>
 
+## This package understands the following switches:
+## --with dietlibc ...  statically links against dietlibc
+
 Name:           runit
 Version:        2.1.1
-Release:        2
+Release:        4%{?_with_dietlibc:diet}
 
 Group:          System/Base
 License:        BSD
@@ -23,6 +26,9 @@ Patch1:         runit-2.1.1-runsvdir-path-cleanup.patch
 Obsoletes: runit <= %{version}-%{release}
 Provides: runit = %{version}-%{release}
 
+BuildRequires: make gcc glibc-static
+%{?_with_dietlibc:BuildRequires:        dietlibc}
+
 Summary:        A UNIX init scheme with service supervision
 
 %description
@@ -39,7 +45,11 @@ Authors:
     Gerrit Pape <pape@smarden.org>
 
 %prep
-%setup -n admin/%{name}-%{version}
+%setup -q -n admin/%{name}-%{version}
+pushd src
+echo "%{?_with_dietlibc:diet -Os }%__cc $RPM_OPT_FLAGS" >conf-cc
+echo "%{?_with_dietlibc:diet -Os }%__cc -Os -pipe"      >conf-ld
+popd
 %patch
 %patch1
 
@@ -60,26 +70,58 @@ done
 %{__rm} -rf %{buildroot}
 
 %post
-if [ $1 = 1 ];
-then
-  grep -q 'RI:123456:respawn:/sbin/runsvdir-start' /etc/inittab
-  if [ $? -eq 1 ]
+if [ $1 = 1 ] ; then
+  rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
+  if [ $? -eq 0 ]
   then
-    echo -n "Installing /sbin/runsvdir-start into /etc/inittab.."
-    echo "RI:123456:respawn:/sbin/runsvdir-start" >> /etc/inittab
-    echo " success."
-    # Reload init
-    telinit q
+    cat >/etc/init/runsvdir.conf <<\EOT
+# for runit - manage /usr/sbin/runsvdir-start
+start on runlevel 2
+start on runlevel 3
+start on runlevel 4
+start on runlevel 5
+stop on shutdown
+respawn
+exec /sbin/runsvdir-start
+EOT
+    # tell init to start the new service
+    start runsvdir
+  else
+    grep -q 'RI:123456:respawn:/sbin/runsvdir-start' /etc/inittab
+    if [ $? -eq 1 ]
+    then
+      echo -n "Installing /sbin/runsvdir-start into /etc/inittab.."
+      echo "RI:123456:respawn:/sbin/runsvdir-start" >> /etc/inittab
+      echo " success."
+      # Reload init
+      telinit q
+    fi
+  fi
+fi
+
+%preun
+if [ $1 = 0 ]
+then
+  rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
+  if [ $? -eq 0 ]
+  then
+    stop runsvdir
   fi
 fi
 
 %postun
-if [ $1 = 0 ];
+if [ $1 = 0 ]
 then
-  echo " #################################################"
-  echo " # Remove /sbin/runsvdir-start from /etc/inittab #"
-  echo " # if you really want to remove runit            #"
-  echo " #################################################"
+  rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
+  if [ $? -eq 0 ]
+  then
+    rm -f /etc/init/runsvdir.conf
+  else
+    echo " #################################################"
+    echo " # Remove /sbin/runsvdir-start from /etc/inittab #"
+    echo " # if you really want to remove runit            #"
+    echo " #################################################"
+  fi
 fi
 
 %files
@@ -100,5 +142,9 @@ fi
 %dir /etc/service
 
 %changelog
+* Wed Jul 20 2011 Robin Bowes <robin.bowes@yo61.com> 2.1.1-4
+-  2.1.1-3 Add BuildRequires
+-  2.1.1-4 Support systems using upstart
+
 * Sun Jan 23 2011 ianmmeyer@gmail.com
 - Make compatible with Redhat based systems
