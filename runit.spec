@@ -8,7 +8,7 @@
 
 Name:           runit
 Version:        2.1.1
-Release:        4%{?_with_dietlibc:diet}
+Release:        5%{?_with_dietlibc:diet}
 
 Group:          System/Base
 License:        BSD
@@ -76,22 +76,19 @@ if [ $1 = 1 ] ; then
   then
     cat >/etc/init/runsvdir.conf <<\EOT
 # for runit - manage /usr/sbin/runsvdir-start
-start on runlevel 2
-start on runlevel 3
-start on runlevel 4
-start on runlevel 5
-stop on shutdown
+start on runlevel [2345]
+stop on runlevel [^2345]
 respawn
 exec /sbin/runsvdir-start
 EOT
     # tell init to start the new service
     start runsvdir
   else
-    grep -q 'RI:123456:respawn:/sbin/runsvdir-start' /etc/inittab
+    grep -q 'RI:2345:respawn:/sbin/runsvdir-start' /etc/inittab
     if [ $? -eq 1 ]
     then
       echo -n "Installing /sbin/runsvdir-start into /etc/inittab.."
-      echo "RI:123456:respawn:/sbin/runsvdir-start" >> /etc/inittab
+      echo "RI:2345:respawn:/sbin/runsvdir-start" >> /etc/inittab
       echo " success."
       # Reload init
       telinit q
