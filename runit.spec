@@ -139,6 +139,9 @@ fi
 %dir /etc/service
 
 %changelog
+* Wed Oct 26 2011 Karsten Sperling <mail@ksperling.net> 2.1.1-5
+- Upstart / inittab tweaks
+
 * Wed Jul 20 2011 Robin Bowes <robin.bowes@yo61.com> 2.1.1-4
 -  2.1.1-3 Add BuildRequires
 -  2.1.1-4 Support systems using upstart
