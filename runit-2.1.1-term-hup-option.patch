@@ -1,0 +1,94 @@
+--- src/runsvdir.c.orig	2011-10-26 16:50:35.000000000 +1300
++++ src/runsvdir.c	2011-10-26 17:16:22.000000000 +1300
+@@ -16,7 +16,7 @@
+ #include "sig.h"
+ #include "ndelay.h"
+ 
+-#define USAGE " [-P] dir"
++#define USAGE " [-P] [-H] dir [log]"
+ #define VERSION "$Id: ecebd0a50510e91639c6a45dda8b0947aa8eb885 $"
+ 
+ #define MAXSERVICES 1000
+@@ -40,6 +40,7 @@
+ struct taia stamplog;
+ int exitsoon =0;
+ int pgrp =0;
++int termexit =1;
+ 
+ void usage () { strerr_die4x(1, "usage: ", progname, USAGE, "\n"); }
+ void fatal(char *m1, char *m2) {
+@@ -51,7 +52,7 @@
+ void warn3x(char *m1, char *m2, char *m3) {
+   strerr_warn6("runsvdir ", svdir, ": warning: ", m1, m2, m3, 0);
+ } 
+-void s_term() { exitsoon =1; }
++void s_term() { exitsoon =termexit; }
+ void s_hangup() { exitsoon =2; }
+ 
+ void runsv(int no, char *name) {
+@@ -172,19 +173,21 @@
+   int i;
+ 
+   progname =*argv++;
+-  if (! argv || ! *argv) usage();
+-  if (**argv == '-') {
+-    switch (*(*argv +1)) {
+-    case 'P': pgrp =1;
+-    case '-': ++argv;
++  while (*argv && (*argv)[0] == '-') {
++    switch ((*argv)[1]) {
++    case 'P': pgrp =1; break;
++    case 'H': termexit =2; break;
++    case '-': break;
++    default: usage();
+     }
+-    if (! argv || ! *argv) usage();
++    argv++;
+   }
++  if (!*argv) usage();
+ 
+   sig_catch(sig_term, s_term);
+   sig_catch(sig_hangup, s_hangup);
+   svdir =*argv++;
+-  if (argv && *argv) {
++  if (*argv) {
+     rplog =*argv;
+     if (setup_log() != 1) {
+       rplog =0;
+--- man/runsvdir.8.orig	2011-10-26 17:09:13.000000000 +1300
++++ man/runsvdir.8	2011-10-26 17:17:47.000000000 +1300
+@@ -4,6 +4,7 @@
+ .SH SYNOPSIS
+ .B runsvdir
+ [\-P]
++[\-H]
+ .I dir
+ [
+ .I log
+@@ -76,10 +77,17 @@
+ to run each
+ .BR runsv (8)
+ process in a new session and separate process group.
++.TP
++.B \-H
++Handle TERM the same as HUP, i.e. send a TERM signal
++to each
++.BR runsv (8)
++process, then exit with 111.
+ .SH SIGNALS
+ If
+ .B runsvdir
+-receives a TERM signal, it exits with 0 immediately.
++receives a TERM signal, it exits with 0 immediately,
++unless \-H is specified in which case TERM is treated like HUP.
+ .P
+ If
+ .B runsvdir
+--- etc/2.orig	2011-10-26 17:21:33.000000000 +1300
++++ etc/2	2011-10-26 17:21:51.000000000 +1300
+@@ -3,4 +3,4 @@
+ PATH=:/bin:/sbin:/usr/bin:/usr/sbin:/usr/X11R6/bin:/usr/local/bin:/usr/local/sbin
+ 
+ exec env - PATH=$PATH \
+-runsvdir -P /etc/service 'log: ...........................................................................................................................................................................................................................................................................................................................................................................................................'
++runsvdir -P -H /etc/service 'log: ...........................................................................................................................................................................................................................................................................................................................................................................................................'
