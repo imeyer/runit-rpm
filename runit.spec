@@ -80,6 +80,7 @@ if [ $1 = 1 ] ; then
 # for runit - manage /usr/sbin/runsvdir-start
 start on runlevel [2345]
 stop on runlevel [^2345]
+normal exit 0 111
 respawn
 exec /sbin/runsvdir-start
 EOT
