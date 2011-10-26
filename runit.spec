@@ -22,6 +22,7 @@ Url:            http://smarden.org/runit/
 Source:         http://smarden.org/runit/runit-%{version}.tar.gz
 Patch:          runit-2.1.1-etc-service.patch
 Patch1:         runit-2.1.1-runsvdir-path-cleanup.patch
+Patch2:         runit-2.1.1-term-hup-option.patch
 
 Obsoletes: runit <= %{version}-%{release}
 Provides: runit = %{version}-%{release}
@@ -52,6 +53,7 @@ echo "%{?_with_dietlibc:diet -Os }%__cc -Os -pipe"      >conf-ld
 popd
 %patch
 %patch1
+%patch2
 
 %build
 sh package/compile
@@ -99,8 +101,7 @@ fi
 %preun
 if [ $1 = 0 ]
 then
-  rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
-  if [ $? -eq 0 ]
+  if [ -f /etc/init/runsvdir.conf ]
   then
     stop runsvdir
   fi
@@ -109,8 +110,7 @@ fi
 %postun
 if [ $1 = 0 ]
 then
-  rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
-  if [ $? -eq 0 ]
+  if [ -f /etc/init/runsvdir.conf ]
   then
     rm -f /etc/init/runsvdir.conf
   else
@@ -140,6 +140,8 @@ fi
 
 %changelog
 * Wed Oct 26 2011 Karsten Sperling <mail@ksperling.net> 2.1.1-5
+- Optionally shut down cleanly even on TERM
+- Don't call rpm in preun, it can cause problems
 - Upstart / inittab tweaks
 
 * Wed Jul 20 2011 Robin Bowes <robin.bowes@yo61.com> 2.1.1-4
