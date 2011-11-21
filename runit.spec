@@ -8,7 +8,7 @@
 
 Name:           runit
 Version:        2.1.1
-Release:        4%{?_with_dietlibc:diet}
+Release:        5%{?_with_dietlibc:diet}
 
 Group:          System/Base
 License:        BSD
@@ -22,6 +22,7 @@ Url:            http://smarden.org/runit/
 Source:         http://smarden.org/runit/runit-%{version}.tar.gz
 Patch:          runit-2.1.1-etc-service.patch
 Patch1:         runit-2.1.1-runsvdir-path-cleanup.patch
+Patch2:         runit-2.1.1-term-hup-option.patch
 
 Obsoletes: runit <= %{version}-%{release}
 Provides: runit = %{version}-%{release}
@@ -52,6 +53,7 @@ echo "%{?_with_dietlibc:diet -Os }%__cc -Os -pipe"      >conf-ld
 popd
 %patch
 %patch1
+%patch2
 
 %build
 sh package/compile
@@ -76,22 +78,20 @@ if [ $1 = 1 ] ; then
   then
     cat >/etc/init/runsvdir.conf <<\EOT
 # for runit - manage /usr/sbin/runsvdir-start
-start on runlevel 2
-start on runlevel 3
-start on runlevel 4
-start on runlevel 5
-stop on shutdown
+start on runlevel [2345]
+stop on runlevel [^2345]
+normal exit 0 111
 respawn
 exec /sbin/runsvdir-start
 EOT
     # tell init to start the new service
     start runsvdir
   else
-    grep -q 'RI:123456:respawn:/sbin/runsvdir-start' /etc/inittab
+    grep -q 'RI:2345:respawn:/sbin/runsvdir-start' /etc/inittab
     if [ $? -eq 1 ]
     then
       echo -n "Installing /sbin/runsvdir-start into /etc/inittab.."
-      echo "RI:123456:respawn:/sbin/runsvdir-start" >> /etc/inittab
+      echo "RI:2345:respawn:/sbin/runsvdir-start" >> /etc/inittab
       echo " success."
       # Reload init
       telinit q
@@ -102,8 +102,7 @@ fi
 %preun
 if [ $1 = 0 ]
 then
-  rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
-  if [ $? -eq 0 ]
+  if [ -f /etc/init/runsvdir.conf ]
   then
     stop runsvdir
   fi
@@ -112,8 +111,7 @@ fi
 %postun
 if [ $1 = 0 ]
 then
-  rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
-  if [ $? -eq 0 ]
+  if [ -f /etc/init/runsvdir.conf ]
   then
     rm -f /etc/init/runsvdir.conf
   else
@@ -142,6 +140,11 @@ fi
 %dir /etc/service
 
 %changelog
+* Wed Oct 26 2011 Karsten Sperling <mail@ksperling.net> 2.1.1-5
+- Optionally shut down cleanly even on TERM
+- Don't call rpm in preun, it can cause problems
+- Upstart / inittab tweaks
+
 * Wed Jul 20 2011 Robin Bowes <robin.bowes@yo61.com> 2.1.1-4
 -  2.1.1-3 Add BuildRequires
 -  2.1.1-4 Support systems using upstart
