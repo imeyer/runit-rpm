@@ -2,9 +2,10 @@
 
 whereami=$(dirname $0)
 
-if [ ! -f "$(which rpmbuild)" ];         then echo "please install 'rpm-build' package and try again" ; exit 1 ; fi
-if [ ! -f "$(which spectool)" ];         then echo "please install 'rpmdevtools' package and try again" ; exit 1 ; fi
-if [ ! -f "$(which rpmdev-setuptree)" ]; then echo "please install 'rpmdevtools' package and try again" ; exit 1 ; fi
+if [ ! -f "/etc/rpm/macros.dist" ];      then echo "please install 'buildsys-macros' rpm and try again" ; exit 1 ; fi
+if [ ! -f "$(which rpmbuild)" ];         then echo "please install 'rpm-build' rpm and try again" ; exit 1 ; fi
+if [ ! -f "$(which spectool)" ];         then echo "please install 'rpmdevtools' rpm and try again" ; exit 1 ; fi
+if [ ! -f "$(which rpmdev-setuptree)" ]; then echo "please install 'rpmdevtools' rpm and try again" ; exit 1 ; fi
 
 # creates ~/rpmbuild
 /usr/bin/rpmdev-setuptree
