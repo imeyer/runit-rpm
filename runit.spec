@@ -27,7 +27,8 @@ Patch2:         runit-2.1.1-term-hup-option.patch
 Obsoletes: runit <= %{version}-%{release}
 Provides: runit = %{version}-%{release}
 
-BuildRequires: make gcc glibc-static
+BuildRequires: make gcc
+%{?el6:BuildRequires:        glibc-static}
 %{?_with_dietlibc:BuildRequires:        dietlibc}
 
 Summary:        A UNIX init scheme with service supervision
