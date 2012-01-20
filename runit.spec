@@ -8,7 +8,7 @@
 
 Name:           runit
 Version:        2.1.1
-Release:        5%{?_with_dietlibc:diet}
+Release:        6%{?_with_dietlibc:diet}%{?dist}
 
 Group:          System/Base
 License:        BSD
@@ -27,7 +27,8 @@ Patch2:         runit-2.1.1-term-hup-option.patch
 Obsoletes: runit <= %{version}-%{release}
 Provides: runit = %{version}-%{release}
 
-BuildRequires: make gcc glibc-static
+BuildRequires: make gcc
+%{?el6:BuildRequires:        glibc-static}
 %{?_with_dietlibc:BuildRequires:        dietlibc}
 
 Summary:        A UNIX init scheme with service supervision
@@ -140,6 +141,9 @@ fi
 %dir /etc/service
 
 %changelog
+* Fri Jan 20 2012 Joe Miller <joeym@joeym.net> 2.1.1-6
+- modified spec to build on centos-5 (by only requiring glibc-static on centos-6)
+
 * Wed Oct 26 2011 Karsten Sperling <mail@ksperling.net> 2.1.1-5
 - Optionally shut down cleanly even on TERM
 - Don't call rpm in preun, it can cause problems

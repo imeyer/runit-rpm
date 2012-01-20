@@ -7,9 +7,7 @@ So, thanks to Scott for the RPMs and thanks to [SuSE](http://www.opensuse.org/) 
 ## Building
 
 1. Clone the repo
-1. `cd $RPMBUILD_DIR` (On RHEL <= 5 this will be `/usr/src/redhat`, anything later will be `~/rpmbuild`)
-1. copy `runit.spec` to your `SPECS` directory
-1. copy `runit-2.1.1-etc-service.patch` and `runit-2.1.1-runsvdir-path-cleanup.patch` to the `SOURCES` directory
-1. `cd $RPMBUILD_DIR/SPECS; rpmbuild -bb runit.spec`
+1. `yum install rpm-build rpmdevtools`
+1. `./build.sh`
 1. Install the RPM
 1. PROFIT!
