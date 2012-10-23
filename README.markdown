@@ -9,5 +9,5 @@ So, thanks to Scott for the RPMs and thanks to [SuSE](http://www.opensuse.org/) 
 1. Clone the repo
 1. `yum install rpm-build rpmdevtools`
 1. `./build.sh`
-1. Install the RPM
+1. `sudo rpm -i ~/rpmbuild/RPMS/*/*.rpm`
 1. PROFIT!
