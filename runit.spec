@@ -29,6 +29,7 @@ Provides: runit = %{version}-%{release}
 
 BuildRequires: make gcc
 %{?el6:BuildRequires:        glibc-static}
+%{?el7:BuildRequires:        glibc-static}
 %{?_with_dietlibc:BuildRequires:        dietlibc}
 
 Summary:        A UNIX init scheme with service supervision
