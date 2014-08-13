@@ -9,7 +9,7 @@ So, thanks to Scott for the RPMs and thanks to [SuSE](http://www.opensuse.org/) 
 ```
 yum -q -y install rpmdevtools git glibc-static
 yum -q -y groupinstall "Development Tools"
-git clone git@github.com:imeyer/runit-rpm runit-rpm
+git clone https://github.com/imeyer/runit-rpm runit-rpm
 cd ./runit-rpm
 ./build.sh
 sudo rpm -i ~/rpmbuild/RPMS/*/*.rpm
