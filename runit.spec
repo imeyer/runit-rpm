@@ -8,7 +8,7 @@
 
 Name:           runit
 Version:        2.1.1
-Release:        6%{?_with_dietlibc:diet}%{?dist}
+Release:        7%{?_with_dietlibc:diet}%{?dist}
 
 Group:          System/Base
 License:        BSD
@@ -19,7 +19,8 @@ License:        BSD
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 Url:            http://smarden.org/runit/
-Source:         http://smarden.org/runit/runit-%{version}.tar.gz
+Source0:        http://smarden.org/runit/runit-%{version}.tar.gz
+Source1:        runsvdir-start.service
 Patch:          runit-2.1.1-etc-service.patch
 Patch1:         runit-2.1.1-runsvdir-path-cleanup.patch
 Patch2:         runit-2.1.1-term-hup-option.patch
@@ -28,8 +29,10 @@ Obsoletes: runit <= %{version}-%{release}
 Provides: runit = %{version}-%{release}
 
 BuildRequires: make gcc
-%{?el6:BuildRequires:        glibc-static}
-%{?el7:BuildRequires:        glibc-static}
+%if 0%{?rhel} >= 6
+BuildRequires:  glibc-static
+%endif
+
 %{?_with_dietlibc:BuildRequires:        dietlibc}
 
 Summary:        A UNIX init scheme with service supervision
@@ -61,6 +64,9 @@ popd
 sh package/compile
 
 %install
+EXTRA_FILES=$RPM_BUILD_ROOT/extra_files
+touch %{EXTRA_FILES}
+
 for i in $(< package/commands) ; do
     %{__install} -D -m 0755 command/$i %{buildroot}%{_sbindir}/$i
 done
@@ -70,15 +76,22 @@ done
 %{__install} -d -m 0755 %{buildroot}/etc/service
 %{__install} -D -m 0750 etc/2 %{buildroot}%{_sbindir}/runsvdir-start
 
+# For systemd only
+%if %{el7}
+%{__install} -D -p -m 0644 $RPM_SOURCE_DIR/runsvdir-start.service \
+                       $RPM_BUILD_ROOT%{_unitdir}/runsvdir-start.service
+echo %{_unitdir}/runsvdir-start.service > %{EXTRA_FILES}
+%endif
+
 %clean
 %{__rm} -rf %{buildroot}
 
 %post
 if [ $1 = 1 ] ; then
-  rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
-  if [ $? -eq 0 ]
-  then
-    cat >/etc/init/runsvdir.conf <<\EOT
+  %if 0%{rhel} >= 6 <= 7
+    rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
+    if [ $? -eq 0 ]; then
+      cat >/etc/init/runsvdir.conf <<\EOT
 # for runit - manage /usr/sbin/runsvdir-start
 start on runlevel [2345]
 stop on runlevel [^2345]
@@ -87,8 +100,15 @@ respawn
 exec /sbin/runsvdir-start
 EOT
     # tell init to start the new service
-    start runsvdir
-  else
+      start runsvdir
+    fi
+  %endif
+
+  %if 0%{rhel} > 7
+    systemctl start runsvdir-start
+  %endif
+
+  %if 0%{rhel} < 6
     grep -q 'RI:2345:respawn:/sbin/runsvdir-start' /etc/inittab
     if [ $? -eq 1 ]
     then
@@ -98,7 +118,7 @@ EOT
       # Reload init
       telinit q
     fi
-  fi
+  %endif
 fi
 
 %preun
@@ -124,7 +144,7 @@ then
   fi
 fi
 
-%files
+%files -f %{EXTRA_FILES}
 %defattr(-,root,root,-)
 %{_sbindir}/chpst
 %{_sbindir}/runit
