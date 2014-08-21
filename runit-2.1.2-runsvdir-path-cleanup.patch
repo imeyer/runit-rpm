@@ -1,4 +1,4 @@
-diff -ur admin/runit-2.1.1/etc/2 admin.new/runit-2.1.1/etc/2
+diff -ur admin/runit-2.1.2/etc/2 admin.new/runit-2.1.2/etc/2
 --- etc/2.orig  2009-10-04 15:44:02.000000000 -0500
 +++ etc/2       2011-01-20 13:41:30.000000000 -0500
 @@ -1,6 +1,6 @@

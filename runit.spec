@@ -1,5 +1,5 @@
 #
-# spec file for package runit (Version 2.1.1)
+# spec file for package runit (Version 2.1.2)
 #
 # Copyright (c) 2010 Ian Meyer <ianmmeyer@gmail.com>
 
@@ -7,8 +7,8 @@
 ## --with dietlibc ...  statically links against dietlibc
 
 Name:           runit
-Version:        2.1.1
-Release:        7%{?_with_dietlibc:diet}%{?dist}
+Version:        2.1.2
+Release:        1%{?_with_dietlibc:diet}%{?dist}
 
 Group:          System/Base
 License:        BSD
@@ -21,9 +21,9 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Url:            http://smarden.org/runit/
 Source0:        http://smarden.org/runit/runit-%{version}.tar.gz
 Source1:        runsvdir-start.service
-Patch:          runit-2.1.1-etc-service.patch
-Patch1:         runit-2.1.1-runsvdir-path-cleanup.patch
-Patch2:         runit-2.1.1-term-hup-option.patch
+Patch:          runit-2.1.2-etc-service.patch
+Patch1:         runit-2.1.2-runsvdir-path-cleanup.patch
+Patch2:         runit-2.1.2-term-hup-option.patch
 
 Obsoletes: runit <= %{version}-%{release}
 Provides: runit = %{version}-%{release}
@@ -157,6 +157,9 @@ fi
 %dir /etc/service
 
 %changelog
+* Thu Aug 21 2014 Chris Gaffney <gaffneyc@gmail.com> 2.1.2-1
+- Initial release of 2.1.2
+
 * Fri Jan 20 2012 Joe Miller <joeym@joeym.net> 2.1.1-6
 - modified spec to build on centos-5 (by only requiring glibc-static on centos-6)
 
