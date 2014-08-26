@@ -77,7 +77,7 @@ done
 %{__install} -D -m 0750 etc/2 %{buildroot}%{_sbindir}/runsvdir-start
 
 # For systemd only
-%if 0%{rhel} >= 7
+%if 0%{?rhel} >= 7
 %{__install} -D -p -m 0644 $RPM_SOURCE_DIR/runsvdir-start.service \
                        $RPM_BUILD_ROOT%{_unitdir}/runsvdir-start.service
 echo %{_unitdir}/runsvdir-start.service > %{EXTRA_FILES}
@@ -88,7 +88,7 @@ echo %{_unitdir}/runsvdir-start.service > %{EXTRA_FILES}
 
 %post
 if [ $1 = 1 ] ; then
-  %if 0%{rhel} >= 6 <= 7
+  %if 0%{?rhel} >= 6 <= 7
     rpm --queryformat='%%{name}' -qf /sbin/init | grep -q upstart
     if [ $? -eq 0 ]; then
       cat >/etc/init/runsvdir.conf <<\EOT
@@ -104,11 +104,11 @@ EOT
     fi
   %endif
 
-  %if 0%{rhel} > 7
+  %if 0%{?rhel} > 7
     systemctl start runsvdir-start
   %endif
 
-  %if 0%{rhel} < 6
+  %if 0%{?rhel} < 6
     grep -q 'RI:2345:respawn:/sbin/runsvdir-start' /etc/inittab
     if [ $? -eq 1 ]; then
       echo -n "Installing /sbin/runsvdir-start into /etc/inittab.."
