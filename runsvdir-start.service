@@ -2,7 +2,8 @@
 Description=Runit Process Supervisor
 
 [Service]
-Type=simple
 ExecStart=/usr/sbin/runsvdir-start
 Restart=always
-RestartSec=500ms
+
+[Install]
+WantedBy=multi-user.target
