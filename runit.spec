@@ -136,7 +136,8 @@ fi
 if [ $1 = 0 ]; then
   if [ -f /etc/init/runsvdir.conf ]; then
     rm -f /etc/init/runsvdir.conf
-  else
+  fi
+  if grep -q runsvdir-start /etc/inittab 2>/dev/null; then
     echo " #################################################"
     echo " # Remove /sbin/runsvdir-start from /etc/inittab #"
     echo " # if you really want to remove runit            #"
