@@ -104,7 +104,7 @@ EOT
     fi
   %endif
 
-  %if 0%{?rhel} > 7
+  %if 0%{?rhel} >= 7
     systemctl start runsvdir-start
   %endif
 
