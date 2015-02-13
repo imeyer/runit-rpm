@@ -105,6 +105,7 @@ EOT
   %endif
 
   %if 0%{?rhel} >= 7
+    systemctl enable runsvdir-start
     systemctl start runsvdir-start
   %endif
 
