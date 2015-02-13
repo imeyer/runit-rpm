@@ -126,6 +126,10 @@ if [ $1 = 0 ]; then
   if [ -f /etc/init/runsvdir.conf ]; then
     stop runsvdir
   fi
+  if [ -f /usr/lib/systemd/system/runsvdir-start.service ]; then
+    systemctl stop runsvdir-start
+    systemctl disable runsvdir-start
+  fi
 fi
 
 %postun
