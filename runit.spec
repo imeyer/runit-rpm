@@ -104,7 +104,8 @@ EOT
     fi
   %endif
 
-  %if 0%{?rhel} > 7
+  %if 0%{?rhel} >= 7
+    systemctl enable runsvdir-start
     systemctl start runsvdir-start
   %endif
 
@@ -125,13 +126,18 @@ if [ $1 = 0 ]; then
   if [ -f /etc/init/runsvdir.conf ]; then
     stop runsvdir
   fi
+  if [ -f /usr/lib/systemd/system/runsvdir-start.service ]; then
+    systemctl stop runsvdir-start
+    systemctl disable runsvdir-start
+  fi
 fi
 
 %postun
 if [ $1 = 0 ]; then
   if [ -f /etc/init/runsvdir.conf ]; then
     rm -f /etc/init/runsvdir.conf
-  else
+  fi
+  if grep -q runsvdir-start /etc/inittab 2>/dev/null; then
     echo " #################################################"
     echo " # Remove /sbin/runsvdir-start from /etc/inittab #"
     echo " # if you really want to remove runit            #"
