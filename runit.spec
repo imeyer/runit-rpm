@@ -32,6 +32,9 @@ BuildRequires: make gcc
 %if 0%{?rhel} >= 6
 BuildRequires:  glibc-static
 %endif
+%if 0%{?rhel} >= 7
+BuildRequires: systemd-units
+%endif
 
 %{?_with_dietlibc:BuildRequires:        dietlibc}
 
