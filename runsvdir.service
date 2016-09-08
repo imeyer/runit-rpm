@@ -1,0 +1,13 @@
+[Unit]
+Description=Runit Process Supervisor
+
+[Service]
+ExecStart=/usr/sbin/runsvdir-start
+Restart=always
+KillMode=process
+OOMScoreAdjust=-1000
+Environment="PATH=/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11R6/bin:/usr/bin:/bin"
+ExecStart=/sbin/runsvdir -P -H /etc/service 'log: ...........................................................................................................................................................................................................................................................................................................................................................................................................'
+
+[Install]
+WantedBy=multi-user.target
