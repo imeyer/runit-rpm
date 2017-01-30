@@ -4,6 +4,7 @@ Description=Runit Process Supervisor
 [Service]
 ExecStart=/usr/sbin/runsvdir-start
 Restart=always
+KillMode=process
 
 [Install]
 WantedBy=multi-user.target
