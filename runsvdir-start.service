@@ -1,9 +1,0 @@
-[Unit]
-Description=Runit Process Supervisor
-
-[Service]
-ExecStart=/usr/sbin/runsvdir-start
-Restart=always
-
-[Install]
-WantedBy=multi-user.target

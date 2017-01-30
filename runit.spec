@@ -20,7 +20,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 Url:            http://smarden.org/runit/
 Source0:        http://smarden.org/runit/runit-%{version}.tar.gz
-Source1:        runsvdir-start.service
+Source1:        runsvdir.service
 Patch:          runit-2.1.2-etc-service.patch
 Patch1:         runit-2.1.2-runsvdir-path-cleanup.patch
 Patch2:         runit-2.1.2-term-hup-option.patch
@@ -77,13 +77,13 @@ for i in man/*8 ; do
     %{__install} -D -m 0755 $i %{buildroot}%{_mandir}/man8/${i##man/}
 done
 %{__install} -d -m 0755 %{buildroot}/etc/service
-%{__install} -D -m 0750 etc/2 %{buildroot}%{_sbindir}/runsvdir-start
+%{__install} -D -m 0750 etc/2 %{buildroot}%{_sbindir}/runsvdir
 
 # For systemd only
 %if 0%{?rhel} >= 7
-%{__install} -D -p -m 0644 $RPM_SOURCE_DIR/runsvdir-start.service \
-                       $RPM_BUILD_ROOT%{_unitdir}/runsvdir-start.service
-echo %{_unitdir}/runsvdir-start.service > %{EXTRA_FILES}
+%{__install} -D -p -m 0644 $RPM_SOURCE_DIR/runsvdir.service \
+                       $RPM_BUILD_ROOT%{_unitdir}/runsvdir.service
+echo %{_unitdir}/runsvdir.service > %{EXTRA_FILES}
 %endif
 
 %clean
@@ -108,8 +108,8 @@ EOT
   %endif
 
   %if 0%{?rhel} >= 7
-    systemctl enable runsvdir-start
-    systemctl start runsvdir-start
+    systemctl enable runsvdir
+    systemctl start runsvdir
   %endif
 
   %if 0%{?rhel} < 6
@@ -129,9 +129,9 @@ if [ $1 = 0 ]; then
   if [ -f /etc/init/runsvdir.conf ]; then
     stop runsvdir
   fi
-  if [ -f /usr/lib/systemd/system/runsvdir-start.service ]; then
-    systemctl stop runsvdir-start
-    systemctl disable runsvdir-start
+  if [ -f /usr/lib/systemd/system/runsvdir.service ]; then
+    systemctl stop runsvdir
+    systemctl disable runsvdir
   fi
 fi
 
